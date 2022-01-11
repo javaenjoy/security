@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.securityapp.mapper.RoleResourcesMapper">
+
+    <select id="findAll"  resultType="RoleResources">
+        select rr.resource_id as resourceId, res.resource_name as resourceName, res.resource_type as resourceType,
+               r.role_name as roleName, r.role_desc as roleDesc
+        from role_resources rr inner join role r inner join resources res
+        on rr.role_id = r.role_id and  rr.resource_id = res.resource_id
+    </select>
+
+
+</mapper>
+

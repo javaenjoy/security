@@ -1,0 +1,188 @@
+
+
+
+CREATE TABLE IF NOT EXISTS staffs (
+    staff_id INT(11) unsigned NOT NULL AUTO_INCREMENT COMMENT "담당자ID" ,
+    name VARCHAR(50) NOT NULL COMMENT "이름" ,
+    email VARCHAR(100) NOT NULL COMMENT "이메일" ,
+    password VARCHAR(100) NOT NULL COMMENT "비밀번호" ,
+    tel VARCHAR(20) NOT NULL COMMENT "전화번호" ,
+    created_by VARCHAR(50) NOT NULL COMMENT "등록자" ,
+    created_at DATETIME NOT NULL COMMENT "등록일시" ,
+    updated_by VARCHAR(50) DEFAULT NULL COMMENT "갱신자" ,
+    updated_at DATETIME DEFAULT NULL COMMENT "갱신일시" ,
+    deleted_by VARCHAR(50) DEFAULT NULL COMMENT "삭제자" ,
+    deleted_at DATETIME DEFAULT NULL COMMENT "삭제일시" ,
+    version INT(11) unsigned NOT NULL DEFAULT 1 COMMENT '개정번호',
+    PRIMARY KEY(staff_id)
+) COMMENT="담당자";
+
+CREATE TABLE IF NOT EXISTS roles (
+    role_id INT(11) unsigned NOT NULL AUTO_INCREMENT COMMENT "역할ID" ,
+    role_key VARCHAR(100) NOT NULL COMMENT "역할키" ,
+    role_name VARCHAR(50) NOT NULL COMMENT "역할명" ,
+    created_by VARCHAR(50) NOT NULL COMMENT "등록자" ,
+    created_at DATETIME NOT NULL COMMENT "등록일시" ,
+    updated_by VARCHAR(50) DEFAULT NULL COMMENT "갱신자" ,
+    updated_at DATETIME DEFAULT NULL COMMENT "갱신일시" ,
+    deleted_by VARCHAR(50) DEFAULT NULL COMMENT "삭제자" ,
+    deleted_at DATETIME DEFAULT NULL COMMENT "삭제일시" ,
+    version INT(11) unsigned NOT NULL DEFAULT 1 COMMENT '개정번호',
+    PRIMARY KEY(role_id)
+) COMMENT="역할";
+
+
+CREATE TABLE IF NOT EXISTS permissions (
+    permission_id INT(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '권한ID' ,
+    category_key VARCHAR(50) NOT NULL COMMENT "권한카테고리키" ,
+    permission_key VARCHAR(100) NOT NULL COMMENT "권한키" ,
+    permission_name VARCHAR(50) NOT NULL COMMENT "권한명" ,
+    created_by VARCHAR(50) NOT NULL COMMENT "등록자" ,
+    created_at DATETIME NOT NULL COMMENT "등록일시" ,
+    updated_by VARCHAR(50) DEFAULT NULL COMMENT "갱신자" ,
+    updated_at DATETIME DEFAULT NULL COMMENT "갱신일시" ,
+    deleted_by VARCHAR(50) DEFAULT NULL COMMENT "삭제자" ,
+    deleted_at DATETIME DEFAULT NULL COMMENT "삭제일시" ,
+    version INT(11) unsigned NOT NULL DEFAULT 1 COMMENT '개정번호',
+    PRIMARY KEY(permission_id)
+) COMMENT="권한" ;
+
+
+
+CREATE TABLE IF NOT EXISTS staff_roles (
+    staff_role_id INT(11) unsigned NOT NULL AUTO_INCREMENT COMMENT "담당자역할ID" ,
+    staff_id INT(11) unsigned NOT NULL COMMENT "담당자ID" ,
+    role_key VARCHAR(100) NOT NULL COMMENT "역할키" ,
+    created_by VARCHAR(50) NOT NULL COMMENT "등록자" ,
+    created_at DATETIME NOT NULL COMMENT "등록일시" ,
+    updated_by VARCHAR(50) DEFAULT NULL COMMENT "갱신자" ,
+    updated_at DATETIME DEFAULT NULL COMMENT "갱신일시" ,
+    deleted_by VARCHAR(50) DEFAULT NULL COMMENT "삭제자" ,
+    deleted_at DATETIME DEFAULT NULL COMMENT "삭제일시" ,
+    version INT(11) unsigned NOT NULL DEFAULT 1 COMMENT '개정번호',
+    PRIMARY KEY(staff_role_id)
+) COMMENT="담당자역할";
+
+
+CREATE TABLE IF NOT EXISTS role_permissions (
+    role_permission_id INT(11) unsigned NOT NULL AUTO_INCREMENT COMMENT "역할권한관계ID" ,
+    role_key VARCHAR(100) NOT NULL COMMENT "역할키" ,
+    permission_id INT(11) NOT NULL COMMENT '권한ID' ,
+    created_by VARCHAR(50) NOT NULL COMMENT "등록자" ,
+    created_at DATETIME NOT NULL COMMENT "등록일시" ,
+    updated_by VARCHAR(50) DEFAULT NULL COMMENT "갱신자" ,
+    updated_at DATETIME DEFAULT NULL COMMENT "갱신일시" ,
+    deleted_by VARCHAR(50) DEFAULT NULL COMMENT "삭제자" ,
+    deleted_at DATETIME DEFAULT NULL COMMENT "삭제일시" ,
+    version INT(11) unsigned NOT NULL DEFAULT 1 COMMENT '개정번호',
+    PRIMARY KEY(role_permission_id)
+) COMMENT="역할권한관계";
+
+
+
+
+select sr.staff_role_id, sr.staff_id, sr.role_key, r.role_name, p.permission_key, p.permission_name
+from staff_roles sr inner join role_permissions rp inner join roles r inner join permissions p
+on sr.role_key = rp.role_key and
+   rp.role_key = r.role_key and
+   rp.permission_id = p.permission_id
+where sr.staff_id = ?;
+
+
+/*------------------------------------------------------------------------------------------------------------
+ 담당자 등록
+------------------------------------------------------------------------------------------------------------*/
+
+INSERT INTO staffs ( name, email, password, tel, created_by, created_at )
+VALUES ('user1', 'java1@gmail.com', '$2a$10$6tC03XNVZqN7rZNpiM77iuygnWV/p3hpJfEq1KNV82t77AdqAR7ty', '011-1111-1111', 'none', NOW());
+
+
+INSERT INTO staffs ( name, email, password, tel, created_by, created_at )
+VALUES ('user2', 'java2@gmail.com', '$2a$10$6tC03XNVZqN7rZNpiM77iuygnWV/p3hpJfEq1KNV82t77AdqAR7ty', '011-1111-1111', 'none', NOW());
+
+
+INSERT INTO staffs ( name, email, password, tel, created_by, created_at )
+VALUES ('user3', 'java3@gmail.com', '$2a$10$6tC03XNVZqN7rZNpiM77iuygnWV/p3hpJfEq1KNV82t77AdqAR7ty', '011-1111-1111', 'none', NOW());
+
+
+/*------------------------------------------------------------------------------------------------------------
+ 역할 등록
+------------------------------------------------------------------------------------------------------------*/
+
+
+INSERT INTO roles (role_key, role_name, created_by, created_at, version)
+VALUES ('system_admin', '시스템관리자', 'none', NOW(), 1);
+
+
+INSERT INTO roles (role_key, role_name, created_by, created_at, version)
+VALUES ('Staff', '일반사원', 'none', NOW(), 1);
+
+
+INSERT INTO roles (role_key, role_name, created_by, created_at, version)
+VALUES ('Manager', '관리자', 'none', NOW(), 1);
+
+
+
+/*------------------------------------------------------------------------------------------------------------
+ 담당자-역할 등록
+------------------------------------------------------------------------------------------------------------*/
+
+
+INSERT INTO staff_roles (staff_id, role_key, created_by, created_at, version)
+VALUES ((SELECT staff_id FROM staffs WHERE email = "java1@gmail.com" AND deleted_at IS NULL), 'Manager', 'none', NOW(), 1);
+
+
+
+INSERT INTO staff_roles (staff_id, role_key, created_by, created_at, version)
+VALUES ((SELECT staff_id FROM staffs WHERE email = "java2@gmail.com" AND deleted_at IS NULL), 'system_admin', 'none', NOW(), 1);
+
+
+
+INSERT INTO staff_roles (staff_id, role_key, created_by, created_at, version)
+VALUES ((SELECT staff_id FROM staffs WHERE email = "java3@gmail.com" AND deleted_at IS NULL), 'Staff', 'none', NOW(), 1);
+
+
+/*------------------------------------------------------------------------------------------------------------
+ 권한 등록
+------------------------------------------------------------------------------------------------------------*/
+
+
+INSERT INTO permissions (category_key, permission_key, permission_name, created_by, created_at, version)
+VALUES ('*', '.*', '모든조작', 'none', NOW(), 1);
+
+
+INSERT INTO permissions (category_key, permission_key, permission_name, created_by, created_at, version)
+VALUES ('Staff', '^Staff\\.(find|show|download)Staff$', '담당자검색', 'none', NOW(), 1);
+
+
+INSERT INTO permissions (category_key, permission_key, permission_name, created_by, created_at, version)
+VALUES ('Manager', '^Staff\\.(new|edit)Staff$', '담당자등록.편집', 'none', NOW(), 1);
+
+
+
+
+
+/*------------------------------------------------------------------------------------------------------------
+ 역할-권한 등록
+------------------------------------------------------------------------------------------------------------*/
+
+
+INSERT INTO role_permissions (role_key, permission_id, created_by, created_at, version)
+VALUES ('Staff', (SELECT permission_id FROM permissions WHERE permission_key = '^Staff\\.(find|show|download)Staff$'), 'none', NOW(), 1);
+
+
+
+INSERT INTO role_permissions (role_key, permission_id, created_by, created_at, version)
+VALUES ('Manager', (SELECT permission_id FROM permissions WHERE permission_key = '^Staff\\.(new|edit)Staff$'), 'none', NOW(), 1);
+
+
+
+INSERT INTO role_permissions (role_key, permission_id, created_by, created_at, version)
+VALUES ('system_admin', (SELECT permission_id FROM permissions WHERE permission_key = '.*'), 'none', NOW(), 1);
+
+
+
+
+
+
+

@@ -1,0 +1,76 @@
+
+create table t_user (
+    id varchar(30) primary key,
+    name varchar(50),
+    email varchar(50),
+    password varchar(100)
+)
+
+
+create table role (
+    role_id tinyint auto_increment primary key,
+    role_desc tinyint,
+    role_name varchar(100)
+)
+
+
+create table resources (
+    resource_id int auto_increment primary key,
+    resource_name varchar(100),
+    resoruce_type varchar(50)
+)
+
+
+create table role_resources (
+    role_resource_id int auto_increment primary key,
+    resource_id int,
+    role_id tinyint,
+    foreign key(role_id) references role(role_id),
+    foreign key(resource_id) references resources(resource_id)
+);
+
+
+
+create table user_role(
+    user_role_id int auto_increment primary key,
+    id varchar(30),
+    role_id tinyint,
+    foreign key(id)  references t_user(id),
+    foreign key(role_id) references role(role_id)
+
+)
+
+
+insert into role(role_desc, role_name) values(1, 'ROLE_USER');
+insert into role(role_desc, role_name) values(2, 'ROLE_MANAGER');
+insert into role(role_desc, role_name) values(1, 'ROLE_ADMIN');
+
+
+insert into resources(resource_name, resource_type) values('/admin/**', 'url');
+insert into resources(resource_name, resource_type) values('/users/testUser', 'url');
+insert into resources(resource_name, resource_type) values('/users/testManager', 'url');
+insert into resources(resource_name, resource_type) values('/users/testAdmin', 'url');
+
+
+insert into role_resources(resource_id , role_id) values (2, 1);
+insert into role_resources(resource_id , role_id) values (3, 2);
+insert into role_resources(resource_id , role_id) values (4, 3);
+
+
+insert into user_role(id, role_id) values('java', 3);
+
+insert into user_role(id, role_id) values('spring', 2);
+
+
+
+
+
+
+
+
+
+
+
+
+
+

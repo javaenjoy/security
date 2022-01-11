@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.securityapp.mapper.RoleMapper">
+
+    <select id="findRoleAll()"  resultType="Role">
+        SELECT role_id as roleId, role_desc as roleDesc, role_name as roleName
+        FROM role
+        ORDER BY role_desc asc
+    </select>
+
+
+</mapper>
+
